@@ -42,18 +42,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     archiveBtn.textContent = 'Archiving...';
 
     try {
-      const response = await chrome.runtime.sendMessage({
-        action: 'downloadArchive',
-        data: archiveData,
-        domain: archiveData.page.domain,
-        title: archiveData.page.title,
-      });
+      const filename = generateFilename(archiveData.page.domain, archiveData.page.title);
+      const jsonString = JSON.stringify(archiveData, null, 2);
 
-      if (response.success) {
-        showStatus(statusEl, 'success', `Saved: ${response.filename}`);
-      } else {
-        showStatus(statusEl, 'error', `Failed: ${response.error}`);
-      }
+      // Create blob and download using a link element (most reliable cross-browser)
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showStatus(statusEl, 'success', `Saved: ${filename}`);
     } catch (error) {
       showStatus(statusEl, 'error', `Error: ${error.message}`);
     }
@@ -157,6 +161,22 @@ async function gatherArchiveData(tab) {
     structuredData: pageMetadata.jsonLd || null,
     discovery: pageMetadata.discovery || {},
   };
+}
+
+function generateFilename(domain, title) {
+  // Clean up domain (remove www., etc.)
+  let cleanDomain = domain.replace(/^www\./, '').replace(/\.[^.]+$/, '');
+
+  // Clean up title - remove special characters, limit length
+  let cleanTitle = title
+    .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename chars
+    .replace(/\s+/g, '_')          // Replace spaces with underscores
+    .substring(0, 50)              // Limit length
+    .replace(/_+$/, '');           // Remove trailing underscores
+
+  const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  return `${cleanDomain}_${cleanTitle}_${timestamp}.json`;
 }
 
 function formatDuration(ms) {
