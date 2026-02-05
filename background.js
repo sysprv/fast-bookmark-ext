@@ -124,13 +124,16 @@ chrome.action.onClicked.addListener(async (tab) => {
     // Generate filename and download
     const filename = generateFilename(domain, title);
     const jsonString = JSON.stringify(archiveData, null, 2);
-    const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const blobUrl = URL.createObjectURL(blob);
 
     chrome.downloads.download({
-      url: dataUrl,
+      url: blobUrl,
       filename: filename,
       saveAs: false,
     }, (downloadId) => {
+      // Clean up the blob URL after download starts
+      URL.revokeObjectURL(blobUrl);
       if (chrome.runtime.lastError) {
         console.error('Tab Archiver: Download failed:', chrome.runtime.lastError.message);
       } else {
