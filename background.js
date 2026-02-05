@@ -1,4 +1,4 @@
-// Background service worker - handles tab tracking and downloads
+// Background script - handles tab tracking and one-click archive
 
 // Store tab open times (tab ID -> timestamp)
 const tabOpenTimes = new Map();
@@ -15,7 +15,6 @@ chrome.tabs.onCreated.addListener((tab) => {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     const history = tabHistory.get(tabId) || [];
-    // Avoid duplicate consecutive entries
     if (history.length === 0 || history[history.length - 1].url !== changeInfo.url) {
       history.push({
         url: changeInfo.url,
@@ -37,72 +36,133 @@ chrome.tabs.query({}, (tabs) => {
   const now = Date.now();
   tabs.forEach((tab) => {
     if (!tabOpenTimes.has(tab.id)) {
-      // We don't know when it was opened, use extension load time as approximation
       tabOpenTimes.set(tab.id, now);
       tabHistory.set(tab.id, tab.url ? [{ url: tab.url, timestamp: now }] : []);
     }
   });
 });
 
-// Generate a safe filename from the domain and title
+// Handle extension icon click - immediately archive the tab
+chrome.action.onClicked.addListener(async (tab) => {
+  try {
+    if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('about:') || tab.url.startsWith('moz-extension://')) {
+      console.log('Tab Archiver: Cannot archive browser internal pages');
+      return;
+    }
+
+    // Get page metadata from content script
+    let pageMetadata = {};
+    try {
+      const response = await chrome.tabs.sendMessage(tab.id, { action: 'getPageMetadata' });
+      if (response && response.success) {
+        pageMetadata = response.metadata;
+      }
+    } catch (e) {
+      // Content script not loaded, inject it
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js'],
+        });
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'getPageMetadata' });
+        if (response && response.success) {
+          pageMetadata = response.metadata;
+        }
+      } catch (injectError) {
+        console.warn('Tab Archiver: Could not inject content script:', injectError);
+      }
+    }
+
+    // Get tab timing info
+    const tabInfo = {
+      openedAt: tabOpenTimes.get(tab.id) || null,
+      openedAtISO: tabOpenTimes.has(tab.id)
+        ? new Date(tabOpenTimes.get(tab.id)).toISOString()
+        : null,
+      navigationHistory: tabHistory.get(tab.id) || [],
+    };
+
+    // Build archive data
+    const now = new Date();
+    const domain = pageMetadata.domain || new URL(tab.url).hostname;
+    const title = pageMetadata.title || tab.title;
+
+    const archiveData = {
+      archive: {
+        version: '1.0',
+        archivedAt: now.toISOString(),
+        archivedAtLocal: now.toLocaleString(),
+      },
+      page: {
+        title: title,
+        url: pageMetadata.url || tab.url,
+        domain: domain,
+        pathname: pageMetadata.pathname || new URL(tab.url).pathname,
+      },
+      tab: {
+        id: tab.id,
+        index: tab.index,
+        windowId: tab.windowId,
+        openedAt: tabInfo.openedAtISO,
+        openedTimestamp: tabInfo.openedAt,
+        navigationHistory: tabInfo.navigationHistory,
+        sessionDuration: tabInfo.openedAt
+          ? Math.round((Date.now() - tabInfo.openedAt) / 1000)
+          : null,
+        sessionDurationFormatted: tabInfo.openedAt
+          ? formatDuration(Date.now() - tabInfo.openedAt)
+          : 'Unknown',
+      },
+      seo: pageMetadata.meta || {},
+      openGraph: pageMetadata.openGraph || {},
+      twitter: pageMetadata.twitter || {},
+      article: pageMetadata.article || {},
+      structuredData: pageMetadata.jsonLd || null,
+      discovery: pageMetadata.discovery || {},
+    };
+
+    // Generate filename and download
+    const filename = generateFilename(domain, title);
+    const jsonString = JSON.stringify(archiveData, null, 2);
+    const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+
+    chrome.downloads.download({
+      url: dataUrl,
+      filename: filename,
+      saveAs: false,
+    }, (downloadId) => {
+      if (chrome.runtime.lastError) {
+        console.error('Tab Archiver: Download failed:', chrome.runtime.lastError.message);
+      } else {
+        console.log('Tab Archiver: Saved', filename);
+      }
+    });
+
+  } catch (error) {
+    console.error('Tab Archiver: Error archiving tab:', error);
+  }
+});
+
 function generateFilename(domain, title) {
-  // Clean up domain (remove www., etc.)
   let cleanDomain = domain.replace(/^www\./, '').replace(/\.[^.]+$/, '');
-
-  // Clean up title - remove special characters, limit length
   let cleanTitle = title
-    .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename chars
-    .replace(/\s+/g, '_')          // Replace spaces with underscores
-    .substring(0, 50)              // Limit length
-    .replace(/_+$/, '');           // Remove trailing underscores
+    .replace(/[<>:"/\\|?*]/g, '')
+    .replace(/\s+/g, '_')
+    .substring(0, 50)
+    .replace(/_+$/, '');
 
-  const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
+  const timestamp = new Date().toISOString().slice(0, 10);
   return `${cleanDomain}_${cleanTitle}_${timestamp}.json`;
 }
 
-// Handle messages from popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'getTabInfo') {
-    const tabId = request.tabId;
+function formatDuration(ms) {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
-    const tabInfo = {
-      openedAt: tabOpenTimes.get(tabId) || null,
-      openedAtISO: tabOpenTimes.has(tabId)
-        ? new Date(tabOpenTimes.get(tabId)).toISOString()
-        : null,
-      navigationHistory: tabHistory.get(tabId) || [],
-      trackedSinceExtensionLoad: !tabOpenTimes.has(tabId) ||
-        (Date.now() - tabOpenTimes.get(tabId)) < 1000,
-    };
-
-    sendResponse({ success: true, tabInfo });
-    return true;
-  }
-
-  if (request.action === 'downloadArchive') {
-    const { data, domain, title } = request;
-    const filename = generateFilename(domain, title);
-    const jsonString = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-
-    // Convert blob to data URL for download
-    const reader = new FileReader();
-    reader.onload = () => {
-      chrome.downloads.download({
-        url: reader.result,
-        filename: `tab-archives/${filename}`,
-        saveAs: false,
-      }, (downloadId) => {
-        if (chrome.runtime.lastError) {
-          sendResponse({ success: false, error: chrome.runtime.lastError.message });
-        } else {
-          sendResponse({ success: true, downloadId, filename });
-        }
-      });
-    };
-    reader.readAsDataURL(blob);
-
-    return true; // Keep message channel open for async response
-  }
-});
+  if (days > 0) return `${days}d ${hours % 24}h`;
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+  return `${seconds}s`;
+}

@@ -10,7 +10,6 @@
     "scripting"
   ],
   "action": {
-    "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.svg",
       "48": "icons/icon48.svg",
