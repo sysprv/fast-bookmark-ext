@@ -128,8 +128,8 @@ chrome.action.onClicked.addListener(async (tab) => {
       filename: filename,
       saveAs: false,
     }, (downloadId) => {
-      // Clean up the blob URL after download starts
-      URL.revokeObjectURL(blobUrl);
+      // Delay cleanup - Firefox needs the blob URL to remain valid
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       if (chrome.runtime.lastError) {
         console.error('Tab Archiver: Download failed:', chrome.runtime.lastError.message);
       } else {
