@@ -146,7 +146,7 @@ function cleanObject(obj) {
   return obj;
 }
 
-// Listen for messages from the popup/background
+// Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getPageMetadata') {
     const metadata = extractPageMetadata();

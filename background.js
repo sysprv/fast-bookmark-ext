@@ -100,18 +100,14 @@ chrome.action.onClicked.addListener(async (tab) => {
         pathname: pageMetadata.pathname || new URL(tab.url).pathname,
       },
       tab: {
-        id: tab.id,
-        index: tab.index,
-        windowId: tab.windowId,
         openedAt: tabInfo.openedAtISO,
-        openedTimestamp: tabInfo.openedAt,
-        navigationHistory: tabInfo.navigationHistory,
         sessionDuration: tabInfo.openedAt
           ? Math.round((Date.now() - tabInfo.openedAt) / 1000)
           : null,
         sessionDurationFormatted: tabInfo.openedAt
           ? formatDuration(Date.now() - tabInfo.openedAt)
           : 'Unknown',
+        navigationHistory: tabInfo.navigationHistory,
       },
       seo: pageMetadata.meta || {},
       openGraph: pageMetadata.openGraph || {},

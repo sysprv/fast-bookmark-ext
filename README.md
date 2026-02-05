@@ -34,11 +34,9 @@ A browser extension that archives tab metadata to JSON files before you close th
 ## Usage
 
 1. Navigate to any webpage you want to archive
-2. Click the Tab Archiver extension icon in your toolbar
-3. Review the metadata preview
-4. Click **"Archive Tab"** to download as JSON, or **"Copy JSON"** to copy to clipboard
+2. Click the Tab Archiver extension icon - JSON downloads immediately
 
-Files are saved to your Downloads folder under `tab-archives/` with the naming format:
+Files are saved to your Downloads folder with the naming format:
 ```
 {domain}_{title}_{date}.json
 ```
@@ -62,7 +60,10 @@ Files are saved to your Downloads folder under `tab-archives/` with the naming f
     "openedAt": "2024-01-15T09:00:00.000Z",
     "sessionDuration": 5400,
     "sessionDurationFormatted": "1h 30m",
-    "navigationHistory": [...]
+    "navigationHistory": [
+      { "url": "https://google.com/search?q=...", "timestamp": 1705312800000 },
+      { "url": "https://example.com/page", "timestamp": 1705313400000 }
+    ]
   },
   "seo": {
     "description": "...",
