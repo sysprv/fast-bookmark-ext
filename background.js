@@ -151,7 +151,7 @@ function generateFilename(domain, title) {
     .replace(/_+$/, '');
 
   const timestamp = new Date().toISOString().slice(0, 10);
-  return `${cleanDomain}_${cleanTitle}_${timestamp}.json`;
+  return `${cleanDomain}_${cleanTitle}_${timestamp}.arc.json`;
 }
 
 function formatDuration(ms) {

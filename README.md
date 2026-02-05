@@ -38,8 +38,10 @@ A browser extension that archives tab metadata to JSON files before you close th
 
 Files are saved to your Downloads folder with the naming format:
 ```
-{domain}_{title}_{date}.json
+{domain}_{title}_{date}.arc.json
 ```
+
+Glob with `*.arc.json` to find all archived tabs.
 
 ## JSON Output Structure
 
