@@ -1,5 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <rect width="128" height="128" rx="16" fill="#4285f4"/>
-  <path d="M32 40h64M32 64h64M32 88h40" stroke="white" stroke-width="10" stroke-linecap="round"/>
-  <path d="M88 80l16 16-16 16" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Drop shadow -->
+  <path d="M14 10 L84 8 L88 16 L82 24 L90 28 L86 36 L110 38 L116 54 L118 74 L116 94 L112 108 L100 118 L76 122 L48 122 L24 118 L12 108 L8 88 L8 60 L10 36 L12 20Z"
+    fill="#000" opacity="0.12" transform="translate(3,3)"/>
+
+  <!-- Main clay tablet body with broken top-right corner -->
+  <path d="M14 10 L84 8 L88 16 L82 24 L90 28 L86 36 L110 38 L116 54 L118 74 L116 94 L112 108 L100 118 L76 122 L48 122 L24 118 L12 108 L8 88 L8 60 L10 36 L12 20Z"
+    fill="#c9a96e"/>
+
+  <!-- Lighter center patch for depth -->
+  <path d="M30 32 L72 30 L78 52 L76 76 L62 88 L36 86 L24 66 L26 44Z"
+    fill="#d6b87e" opacity="0.45"/>
+
+  <!-- Edge outline -->
+  <path d="M14 10 L84 8 L88 16 L82 24 L90 28 L86 36 L110 38 L116 54 L118 74 L116 94 L112 108 L100 118 L76 122 L48 122 L24 118 L12 108 L8 88 L8 60 L10 36 L12 20Z"
+    fill="none" stroke="#9c7642" stroke-width="1.5"/>
+
+  <!-- Break edge highlight -->
+  <path d="M84 8 L88 16 L82 24 L90 28 L86 36" stroke="#b89550" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Cuneiform wedge marks -->
+  <g fill="#6e4f24" opacity="0.85">
+    <!-- Row 1 -->
+    <polygon points="24,34 36,36 24,38"/>
+    <polygon points="42,32 46,42 38,42"/>
+    <polygon points="54,34 66,36 54,38"/>
+    <polygon points="72,32 76,42 68,42"/>
+
+    <!-- Row 2 -->
+    <polygon points="22,52 34,54 22,56"/>
+    <polygon points="40,50 44,60 36,60"/>
+    <polygon points="52,52 64,54 52,56"/>
+    <polygon points="70,52 82,54 70,56"/>
+    <polygon points="88,50 92,60 84,60"/>
+
+    <!-- Row 3 -->
+    <polygon points="24,70 36,72 24,74"/>
+    <polygon points="42,68 46,78 38,78"/>
+    <polygon points="56,70 68,72 56,74"/>
+    <polygon points="74,68 78,78 70,78"/>
+    <polygon points="86,70 98,72 86,74"/>
+
+    <!-- Row 4 -->
+    <polygon points="22,88 34,90 22,92"/>
+    <polygon points="40,86 44,96 36,96"/>
+    <polygon points="54,88 66,90 54,92"/>
+    <polygon points="72,88 84,90 72,92"/>
+
+    <!-- Row 5 (partial, near bottom) -->
+    <polygon points="26,104 38,106 26,108"/>
+    <polygon points="44,102 48,112 40,112"/>
+    <polygon points="58,104 70,106 58,108"/>
+  </g>
+
+  <!-- Crack 1 - runs diagonally across upper area -->
+  <path d="M48 8 L52 24 L48 40 L52 52" stroke="#a08050" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M52 24 L58 28" stroke="#a08050" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+  <!-- Crack 2 - lower left -->
+  <path d="M8 82 L22 78 L34 82" stroke="#a08050" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+
+  <!-- Small chip missing from bottom edge -->
+  <path d="M58 122 L62 118 L66 122" fill="#f0ebe0" stroke="none"/>
 </svg>
