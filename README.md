@@ -16,20 +16,49 @@ A browser extension that archives tab metadata to JSON files before you close th
 
 ## Installation
 
+### Firefox (enterprise policy — all profiles)
+
+Use a system-wide policy to force-install the extension across all Firefox profiles. This works on release Firefox and bypasses signing.
+
+1. Build the XPI: `make xpi`
+2. Create `/etc/firefox/policies/policies.json`:
+   ```json
+   {
+     "policies": {
+       "ExtensionSettings": {
+         "fast-bookmark-ext@local": {
+           "installation_mode": "force_installed",
+           "install_url": "file:///path/to/fast-bookmark-ext.xpi"
+         }
+       }
+     }
+   }
+   ```
+   Replace `/path/to` with the actual absolute path to the XPI.
+3. Restart Firefox
+
+### Firefox (per-profile)
+
+Requires Firefox Developer Edition or Nightly (`xpinstall.signatures.required` must be set to `false` in `about:config`). This setting is ignored in release Firefox since version 48.
+
+1. Build the XPI: `make xpi`
+2. Copy or symlink it into your profile's extensions directory, named by the extension ID:
+   ```
+   cp fast-bookmark-ext.xpi /path/to/profile/extensions/fast-bookmark-ext@local.xpi
+   ```
+3. Restart Firefox
+
+### Firefox (temporary)
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click "Load Temporary Add-on"
+3. Select `manifest.json` — the extension is removed when Firefox closes
+
 ### Chrome
 
 1. Open `chrome://extensions/`
 2. Enable "Developer mode" (toggle in top right)
-3. Click "Load unpacked"
-4. Select this extension folder
-
-### Firefox
-
-1. Open `about:debugging#/runtime/this-firefox`
-2. Click "Load Temporary Add-on"
-3. Select the `manifest.json` file in this folder
-
-**Note**: For permanent Firefox installation, the extension needs to be signed or you need Firefox Developer Edition with `xpinstall.signatures.required` set to `false`.
+3. Click "Load unpacked" and select this extension folder
 
 ## Usage
 

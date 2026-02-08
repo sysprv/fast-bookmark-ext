@@ -14,16 +14,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Create zip
-        run: zip -r tab-archiver.zip manifest.json background.js content.js icons/ README.md
+        run: zip -r fast-bookmark-ext.zip manifest.json background.js content.js icons/ COPYING README.md
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tab-archiver
-          path: tab-archiver.zip
+          name: fast-bookmark-ext
+          path: fast-bookmark-ext.zip
 
       - name: Upload to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: tab-archiver.zip
+          files: fast-bookmark-ext.zip

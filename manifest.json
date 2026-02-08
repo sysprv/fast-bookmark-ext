@@ -32,5 +32,11 @@
       "js": ["content.js"],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "fast-bookmark-ext@local",
+      "strict_min_version": "109.0"
+    }
+  }
 }
