@@ -46,7 +46,7 @@ chrome.tabs.query({}, (tabs) => {
 chrome.action.onClicked.addListener(async (tab) => {
   try {
     if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('about:') || tab.url.startsWith('moz-extension://')) {
-      console.log('Tab Archiver: Cannot archive browser internal pages');
+      console.log('fast-bookmark-ext: Cannot archive browser internal pages');
       return;
     }
 
@@ -69,7 +69,7 @@ chrome.action.onClicked.addListener(async (tab) => {
           pageMetadata = response.metadata;
         }
       } catch (injectError) {
-        console.warn('Tab Archiver: Could not inject content script:', injectError);
+        console.warn('fast-bookmark-ext: Could not inject content script:', injectError);
       }
     }
 
@@ -131,14 +131,14 @@ chrome.action.onClicked.addListener(async (tab) => {
       // Delay cleanup - Firefox needs the blob URL to remain valid
       setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       if (chrome.runtime.lastError) {
-        console.error('Tab Archiver: Download failed:', chrome.runtime.lastError.message);
+        console.error('fast-bookmark-ext: Download failed:', chrome.runtime.lastError.message);
       } else {
-        console.log('Tab Archiver: Saved', filename);
+        console.log('fast-bookmark-ext: Saved', filename);
       }
     });
 
   } catch (error) {
-    console.error('Tab Archiver: Error archiving tab:', error);
+    console.error('fast-bookmark-ext: Error archiving tab:', error);
   }
 });
 

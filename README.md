@@ -1,4 +1,4 @@
-# Tab Archiver
+# Fast Bookmark
 
 A browser extension that archives tab metadata to JSON files before you close them.
 
@@ -63,7 +63,7 @@ Requires Firefox Developer Edition or Nightly (`xpinstall.signatures.required` m
 ## Usage
 
 1. Navigate to any webpage you want to archive
-2. Click the Tab Archiver extension icon - JSON downloads immediately
+2. Click the Fast Bookmark extension icon - JSON downloads immediately
 
 Files are saved to your Downloads folder with the naming format:
 ```

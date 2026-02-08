@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Tab Archiver is a browser extension (Manifest V3) that archives tab metadata to JSON files. When the user clicks the extension icon, it immediately downloads a `.arc.json` file containing page metadata, navigation history, timing data, SEO tags, Open Graph, Twitter Cards, structured data, and more. Targets both Chrome and Firefox.
+Fast Bookmark is a browser extension (Manifest V3) that archives tab metadata to JSON files. When the user clicks the extension icon, it immediately downloads a `.arc.json` file containing page metadata, navigation history, timing data, SEO tags, Open Graph, Twitter Cards, structured data, and more. Targets both Chrome and Firefox.
 
 ## Build & Development
 
