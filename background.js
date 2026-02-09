@@ -120,16 +120,13 @@ chrome.action.onClicked.addListener(async (tab) => {
     // Generate filename and download
     const filename = generateFilename(domain, title);
     const jsonString = JSON.stringify(archiveData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const blobUrl = URL.createObjectURL(blob);
+    const dataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(jsonString)));
 
     chrome.downloads.download({
-      url: blobUrl,
+      url: dataUrl,
       filename: filename,
       saveAs: false,
     }, (downloadId) => {
-      // Delay cleanup - Firefox needs the blob URL to remain valid
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       if (chrome.runtime.lastError) {
         console.error('fast-bookmark-ext: Download failed:', chrome.runtime.lastError.message);
       } else {
